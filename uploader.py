@@ -7,26 +7,31 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 
+# Unified credentials configuration
 YT_REFRESH_TOKEN = os.environ.get("YT_REFRESH_TOKEN")
 YT_CLIENT_ID = os.environ.get("YT_CLIENT_ID")
 YT_CLIENT_SECRET = os.environ.get("YT_CLIENT_SECRET")
-GD_REFRESH_TOKEN = os.environ.get("GD_REFRESH_TOKEN")
 
-# Client 2 ka naya Google Drive folder ID
+# Client 2 ka Google Drive folder ID
 FOLDER_IDS = ["1QTsf1-HncTXoyLQzy47XKk9p4Vr5HH3w"]
 
-if not all([YT_REFRESH_TOKEN, YT_CLIENT_ID, YT_CLIENT_SECRET, GD_REFRESH_TOKEN]):
+print("--- Checking Environment Variables ---")
+print(f"YT_CLIENT_ID Present: {bool(YT_CLIENT_ID)}")
+print(f"YT_CLIENT_SECRET Present: {bool(YT_CLIENT_SECRET)}")
+print(f"YT_REFRESH_TOKEN Present: {bool(YT_REFRESH_TOKEN)}")
+
+if not all([YT_REFRESH_TOKEN, YT_CLIENT_ID, YT_CLIENT_SECRET]):
     print("❌ Error: Missing required environment secrets!")
     sys.exit(1)
 
-# Tumhara diya hua exact Title (Shayari ke hisab se)
+# Exact Title for Shayari
 FIXED_TITLE = "Heart Touching Shayari 💔 | Sad Status 🥺✨ #shorts #shayari #viral"
 
-# Tumhara diya hua exact Description
+# Exact Description provided by you
 FIXED_DESCRIPTION = """Heart touching shayari 💔 
 
 #truelovepoetry​ #hearttouching​ #shorts​ #youtubeshorts​ #trendingnow​ #viralshorts​ #shortsfeed​ #explorepage​ #trendingshorts​ #shortsviral​ #shortschallenge​ #viralvideo​ #trending​ #dailyshorts​ #viralvideo​  #reels​ #shortstrend​ #foryou​ #trendingreels​ #fyp​ #viraltrend​  #explore​ #foryoupage​ #shortsdaily​ #indiashorts​ #funnyshorts​ #shortsindia​ #danceshorts​ #musicshorts​ #comedyshorts​ #vlogshorts​ #foodshorts​ #fashionshorts​ #shortscompilations​ #creativeshorts​ #memeshorts​ #gamingshorts​ #sportsshorts​ #lifestyleshorts​ #fitnessshorts​ #techshorts​ #animalshorts​ #shortscreator​ #relatableshorts​  #challengeaccepted​ #shortsreels​ #viralchallenge​ #coupleshorts​ #shortslove​ #sadshorts​  #motivationshorts​ #shortsgoals​ #travelshorts​ #artshorts​ #shortswithme​ #funshorts​ #reactionshorts​ #lifehacksshorts​ #prankshorts​ #shortsdance​ #transformationshortsmalayalam​ #shortscomedy​ #feelgoodshorts​ #diyshorts​ #shortsmoment​ #shortstoday​ #learningshorts​ #shortsvibes​ #coolshorts​  #quickshorts​ #randomshorts​ #shortsmemes​ #memereels​ #shortstravel​ #musicreels​ #emotionalshorts​ #fitnessjourney​ #shortsforyou​ 
-#sad​ #viral​ #shayari​ #shorts​ #shayari​ #romantic​ #broken​ #Shayari​ #Poetry​   #urdushayari​  #hindishayari​  #urduquotes​  #heartbrokenshayari​  #romanticshayari​  #attitudeshayari​  #emotionalshayari​  #lovepoetryhindi​  #shortshayari​  #hindipoetry​  #lifeshayari​  #dardshayari​  #dostishayari​  #zindagishayaristatus​  #ishqshayari​  #shortshayari​  #sadpoetry​  #lovequotes​  #tanhaishayari​  #aloneshayari​  #mohabbatshayaries​  #gazal​  #shere​  #nazm​  #painshayari​  #instashayari​  #hindiquotes​  #urduquotes​  #brokenshayaristatus​  #trueloveshayaristatus​  #shayariworld​  #dilshayari​  #bestshayari​   #shayari​  #breakupshayari​  #pyarshayari​  #jazbaat​  #alfaaz​  #ishqstatus​  #shortfeed​  #ytshorts​  #viralshorts​  #trending​  #shorts​  #poetrylovers​ 
+#sad​ #viral​ #shayari​ #shorts​ #shayari​ #romantic​ #broken​ #Shayari​ #Poetry​   #urdushayari​  #hindishayari​  #urduquotes​  #heartbrokenshayari​  #romanticshayari​  #attitudeshayari​  #emotionalshayari​  #lovepoetryhindi​  #shortshayari​  #hindipoetry​  #lifeshayari​  #dardshayari​  #dostishayari​  #zindagishayaristatus​  #ishqshayari​  #shortshayari​  #sadpoetry​  #lovequotes​  #tanhaishayari​  #aloneshayari​  #mohabbatshayaries​  #gazal​  #shere​  #nazm​  #painshayari​  #instashayari​  #hindiquotes​  #urduquotes​  #brokenshayaristatus​  #trueloveshayaristatus​  #shayariworld​  #dilshayari​  #bestshayari​   #shayari​  #breakupshayari​  #pyarshayari​  #jazbaat​  #alfaaz​  #ishqstatus​  #shortfeed​  #ytshorts​ #viralshorts​ #trending​ #shorts​ #poetrylovers​ 
 #shayaristatus​  #explore​ #shorts​ #shorts​ 
 #shayari​ #sadsong​ #sadshayari​ #song​ #sad​  #status​ #shayaristatus​ #loveshayari​ #urdu​ shayari#urdu​#heart​ touching shayari#tiktok​#shayari​ shayari#new​ song#kaffara​#shayri​#shayari​ video#shayariyan​#sher​ shayari#शायरी​#romantic​ video#poetry​#shorts​#bewafa​ shayari#sayri​#
 sad video#shayari​ love#new​ shayari#sad​ song status#sad​ song status#romantic​ shayari#short​ video#sad​ short video#sad​ songs#pakistani​ drama#sayari​#heart​ touching video#heart​ broken shayari#sad​ story#songs​#dance​ video#love​ status#shairy​ #dance​#short​ 
@@ -56,7 +61,7 @@ def get_video_from_drive():
     print("📥 Connecting to Google Drive...")
     creds = Credentials(
         token=None,
-        refresh_token=GD_REFRESH_TOKEN.strip(),
+        refresh_token=YT_REFRESH_TOKEN.strip(),
         token_uri="https://oauth2.googleapis.com/token",
         client_id=YT_CLIENT_ID.strip(),
         client_secret=YT_CLIENT_SECRET.strip()
